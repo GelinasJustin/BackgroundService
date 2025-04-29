@@ -11,6 +11,7 @@ namespace BackgroundService.Services
     public class UserData
     {
         public int Score { get; set; } = 0;
+        public int Multiplier { get; set; } = 1;
         // TODO: Ajouter une propriété pour le multiplier
     }
 
@@ -45,7 +46,14 @@ namespace BackgroundService.Services
         {
             UserData userData = _data[userId];
             // TODO: Ajouter la valeur du muliplier au lieu d'ajouter 1
-            userData.Score += 1;
+            userData.Score += userData.Multiplier;
+        }
+
+        public void BuyMultiplier(string userId) 
+        {
+            UserData userData = _data[userId];
+            userData.Score -= userData.Multiplier * Game.MULTIPLIER_BASE_PRICE;
+            userData.Multiplier *= 2;
         }
 
         // TODO: Ajouter une méthode pour acheter un multiplier. Le coût est le prix de base * le multiplier actuel
@@ -77,6 +85,7 @@ namespace BackgroundService.Services
             {
                 // TODO: On remet le multiplier à 1!
                 _data[key].Score = 0;
+                _data[key].Multiplier = 1;
             }
 
             // Aucune participation!
@@ -99,6 +108,12 @@ namespace BackgroundService.Services
                 // TODO: Mettre à jour et sauvegarder le nbWinds des joueurs
 
                 List<IdentityUser> users = await backgroundServiceContext.Users.Where(u => winners.Contains(u.Id)).ToListAsync();
+
+                foreach (IdentityUser user in users) 
+                {
+                    backgroundServiceContext.Player.Where(p => p.UserId == user.Id).First().NbWins++;
+                    await backgroundServiceContext.SaveChangesAsync();
+                }
 
                 RoundResult roundResult = new RoundResult()
                 {

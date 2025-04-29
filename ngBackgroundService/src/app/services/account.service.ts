@@ -7,7 +7,7 @@ import { lastValueFrom } from 'rxjs';
 })
 export class AccountService {
 
-  baseUrl = "https://localhost:7056/";
+  baseUrl = "http://localhost:5080/";
   apiBaseUrl = this.baseUrl + "api/"
   accountBaseUrl = this.apiBaseUrl + "Account/";
 
